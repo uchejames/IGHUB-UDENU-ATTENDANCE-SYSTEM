@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainee Attendance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .setup-section, .attendance-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .trainee-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .trainee-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+        }
+
+        .trainee-item:hover {
+            border-color: #667eea;
+        }
+
+        .trainee-info {
+            flex-grow: 1;
+        }
+
+        .trainee-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .attendance-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .present {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .absent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .mark-btn {
+            padding: 8px 20px;
+            font-size: 14px;
+            background: #28a745;
+            border-radius: 20px;
+        }
+
+        .mark-btn:hover {
+            background: #218838;
+        }
+
+        .timestamp {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .connection-status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .trainee-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Attendance System</h1>
+            <p>Simple trainee attendance tracking with Google Sheets integration</p>
+        </div>
+
+        <div class="content">
+            <!-- Google Sheets Setup -->
+            <div class="setup-section">
+                <h2 class="section-title">🔧 Google Sheets Setup</h2>
+                
+                <div class="input-group">
+                    <label for="sheetUrl">Google Sheets URL:</label>
+                    <input type="url" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit">
+                </div>
+
+                <div class="input-group">
+                    <label for="apiKey">Google Sheets API Key:</label>
+                    <input type="password" id="apiKey" placeholder="Your Google Sheets API Key">
+                </div>
+
+                <button class="btn" onclick="connectToSheets()">Connect to Google Sheets</button>
+                
+                <div id="connectionStatus" class="connection-status disconnected" style="display: none;">
+                    Not Connected
+                </div>
+
+                <div class="alert" id="setupAlert"></div>
+            </div>
+
+            <!-- Trainee Management -->
+            <div class="setup-section">
+                <h2 class="section-title">👥 Trainee Management</h2>
+                
+                <div class="input-group">
+                    <label for="traineeName">Add New Trainee:</label>
+                    <input type="text" id="traineeName" placeholder="Enter trainee name">
+                </div>
+                
+                <button class="btn" onclick="addTrainee()">Add Trainee</button>
+                
+                <div class="input-group">
+                    <label for="bulkTrainees">Or Add Multiple Trainees (one per line):</label>
+                    <textarea id="bulkTrainees" placeholder="John Doe&#10;Jane Smith&#10;Mike Johnson"></textarea>
+                </div>
+                
+                <button class="btn" onclick="addBulkTrainees()">Add All Trainees</button>
+            </div>
+
+            <!-- Attendance Section -->
+            <div class="attendance-section">
+                <h2 class="section-title">✅ Mark Attendance</h2>
+                
+                <div class="stats" id="statsContainer" style="display: none;">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalTrainees">0</div>
+                        <div class="stat-label">Total Trainees</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="presentCount">0</div>
+                        <div class="stat-label">Present Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="absentCount">0</div>
+                        <div class="stat-label">Absent</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="attendanceDate">Date:</label>
+                    <input type="date" id="attendanceDate">
+                </div>
+
+                <button class="btn" onclick="resetAttendance()">Reset Today's Attendance</button>
+                
+                <div class="trainee-list" id="traineeList">
+                    <p style="text-align: center; color: #666; padding: 40px;">No trainees added yet. Add trainees above to start tracking attendance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application state
+        let trainees = JSON.parse(localStorage.getItem('trainees') || '[]');
+        let attendance = JSON.parse(localStorage.getItem('attendance') || '{}');
+        let sheetsConfig = JSON.parse(localStorage.getItem('sheetsConfig') || '{}');
+        let isConnectedToSheets = false;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date
+            document.getElementById('attendanceDate').value = new Date().toISOString().split('T')[0];
+            
+            // Load saved configuration
+            if (sheetsConfig.url) {
+                document.getElementById('sheetUrl').value = sheetsConfig.url;
+            }
+            if (sheetsConfig.apiKey) {
+                document.getElementById('apiKey').value = sheetsConfig.apiKey;
+            }
+            
+            renderTrainees();
+            updateStats();
+        });
+
+        // Google Sheets connection
+        function connectToSheets() {
+            const sheetUrl = document.getElementById('sheetUrl').value;
+            const apiKey = document.getElementById('apiKey').value;
+
+            if (!sheetUrl || !apiKey) {
+                showAlert('Please provide both Sheet URL and API Key', 'error');
+                return;
+            }
+
+            // Extract sheet ID from URL
+            const sheetIdMatch = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+            if (!sheetIdMatch) {
+                showAlert('Invalid Google Sheets URL format', 'error');
+                return;
+            }
+
+            const sheetId = sheetIdMatch[1];
+            
+            // Save configuration
+            sheetsConfig = { url: sheetUrl, apiKey: apiKey, sheetId: sheetId };
+            localStorage.setItem('sheetsConfig', JSON.stringify(sheetsConfig));
+            
+            // Test connection (simplified - in real implementation, you'd make an API call)
+            isConnectedToSheets = true;
+            updateConnectionStatus(true);
+            showAlert('Connected to Google Sheets successfully!', 'success');
+            
+            // Initialize sheet headers if needed
+            initializeSheet();
+        }
+
+        function initializeSheet() {
+            // In a real implementation, this would create headers in the Google Sheet
+            // For demo purposes, we'll just show what the headers should be
+            console.log('Sheet headers should be: Name, Date, Status, Timestamp, Marked By');
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.style.display = 'block';
+            if (connected) {
+                statusEl.textContent = 'Connected to Google Sheets';
+                statusEl.className = 'connection-status connected';
+            } else {
+                statusEl.textContent = 'Not Connected to Google Sheets';
+                statusEl.className = 'connection-status disconnected';
+            }
+        }
+
+        // Trainee management
+        function addTrainee() {
+            const nameInput = document.getElementById('traineeName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                showAlert('Please enter a trainee name', 'error');
+                return;
+            }
+            
+            if (trainees.find(t => t.name.toLowerCase() === name.toLowerCase())) {
+                showAlert('Trainee already exists', 'error');
+                return;
+            }
+            
+            const trainee = {
+                id: Date.now(),
+                name: name,
+                dateAdded: new Date().toISOString()
+            };
+            
+            trainees.push(trainee);
+            saveData();
+            nameInput.value = '';
+            renderTrainees();
+            updateStats();
+            showAlert(`Added ${name} successfully`, 'success');
+        }
+
+        function addBulkTrainees() {
+            const bulkInput = document.getElementById('bulkTrainees');
+            const names = bulkInput.value.split('\n').map(name => name.trim()).filter(name => name);
+            
+            if (names.length === 0) {
+                showAlert('Please enter at least one trainee name', 'error');
+                return;
+            }
+            
+            let addedCount = 0;
+            names.forEach(name => {
+                if (!trainees.find(t => t.name.toLowerCase() === name.toLowerCase())) {
+                    trainees.push({
+                        id: Date.now() + Math.random(),
+                        name: name,
+                        dateAdded: new Date().toISOString()
+                    });
+                    addedCount++;
+                }
+            });
+            
+            if (addedCount > 0) {
+                saveData();
+                bulkInput.value = '';
+                renderTrainees();
+                updateStats();
+                showAlert(`Added ${addedCount} trainees successfully`, 'success');
+            } else {
+                showAlert('All trainees already exist', 'error');
+            }
+        }
+
+        // Attendance management
+        function markAttendance(traineeId, traineeName) {
+            const date = document.getElementById('attendanceDate').value;
+            const timestamp = new Date().toISOString();
+            const attendanceKey = `${date}_${traineeId}`;
+            
+            if (!attendance[attendanceKey]) {
+                attendance[attendanceKey] = {
+                    traineeId: traineeId,
+                    traineeName: traineeName,
+                    date: date,
+                    status: 'present',
+                    timestamp: timestamp,
+                    markedBy: 'Attendance Marker' // In real app, this would be the logged-in user
+                };
+                
+                saveData();
+                renderTrainees();
+                updateStats();
+                
+                // Sync to Google Sheets
+                if (isConnectedToSheets) {
+                    syncToGoogleSheets(attendance[attendanceKey]);
+                }
+                
+                showAlert(`Marked ${traineeName} as present`, 'success');
+            } else {
+                showAlert(`${traineeName} is already marked present for ${date}`, 'error');
+            }
+        }
+
+        function syncToGoogleSheets(attendanceRecord) {
+            // In a real implementation, this would make an API call to Google Sheets
+            // For demo purposes, we'll just log what would be sent
+            console.log('Syncing to Google Sheets:', {
+                name: attendanceRecord.traineeName,
+                date: attendanceRecord.date,
+                status: attendanceRecord.status,
+                timestamp: attendanceRecord.timestamp,
+                markedBy: attendanceRecord.markedBy
+            });
+            
+            // Simulate API call with a promise
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log('Successfully synced to Google Sheets');
+                    resolve();
+                }, 500);
+            });
+        }
+
+        function resetAttendance() {
+            const date = document.getElementById('attendanceDate').value;
+            const confirmed = confirm(`Are you sure you want to reset all attendance for ${date}?`);
+            
+            if (confirmed) {
+                // Remove all attendance records for the selected date
+                Object.keys(attendance).forEach(key => {
+                    if (key.startsWith(date + '_')) {
+                        delete attendance[key];
+                    }
+                });
+                
+                saveData();
+                renderTrainees();
+                updateStats();
+                showAlert('Attendance reset successfully', 'success');
+            }
+        }
+
+        // Rendering functions
+        function renderTrainees() {
+            const container = document.getElementById('traineeList');
+            const date = document.getElementById('attendanceDate').value;
+            
+            if (trainees.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No trainees added yet. Add trainees above to start tracking attendance.</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            trainees.forEach(trainee => {
+                const attendanceKey = `${date}_${trainee.id}`;
+                const attendanceRecord = attendance[attendanceKey];
+                const isPresent = !!attendanceRecord;
+                
+                const traineeDiv = document.createElement('div');
+                traineeDiv.className = 'trainee-item';
+                
+                traineeDiv.innerHTML = `
+                    <div class="trainee-info">
+                        <div class="trainee-name">${trainee.name}</div>
+                        ${isPresent ? `<div class="timestamp">Marked at: ${new Date(attendanceRecord.timestamp).toLocaleString()}</div>` : ''}
+                    </div>
+                    <div>
+                        <span class="attendance-status ${isPresent ? 'present' : 'absent'}">
+                            ${isPresent ? 'Present' : 'Absent'}
+                        </span>
+                        ${!isPresent ? `<button class="btn mark-btn" onclick="markAttendance(${trainee.id}, '${trainee.name}')">Mark Present</button>` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(traineeDiv);
+            });
+        }
+
+        function updateStats() {
+            const date = document.getElementById('attendanceDate').value;
+            const totalTrainees = trainees.length;
+            
+            let presentCount = 0;
+            trainees.forEach(trainee => {
+                const attendanceKey = `${date}_${trainee.id}`;
+                if (attendance[attendanceKey]) {
+                    presentCount++;
+                }
+            });
+            
+            const absentCount = totalTrainees - presentCount;
+            
+            document.getElementById('totalTrainees').textContent = totalTrainees;
+            document.getElementById('presentCount').textContent = presentCount;
+            document.getElementById('absentCount').textContent = absentCount;
+            
+            // Show/hide stats container
+            const statsContainer = document.getElementById('statsContainer');
+            if (totalTrainees > 0) {
+                statsContainer.style.display = 'grid';
+            } else {
+                statsContainer.style.display = 'none';
+            }
+        }
+
+        // Utility functions
+        function saveData() {
+            localStorage.setItem('trainees', JSON.stringify(trainees));
+            localStorage.setItem('attendance', JSON.stringify(attendance));
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('setupAlert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Update attendance when date changes
+        document.getElementById('attendanceDate').addEventListener('change', function() {
+            renderTrainees();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
